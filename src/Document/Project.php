@@ -3,14 +3,24 @@
 namespace App\Document;
 
 use App\Config\StatusType;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\ApiResource;
-use DateTimeImmutable;
+use ApiPlatform\Metadata\GetCollection;
 use Ramsey\Uuid\Guid\Guid as RamseyGuid;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-#[ApiResource]
-#[ODM\Document(collection: 'project')]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            paginationEnabled: true,
+            paginationItemsPerPage: 3,
+        ),
+        new Post,
+    ],
+    order: ['createdAt' => 'DESC'],
+)]
 
+#[ODM\Document(collection: 'project')]
 class Project
 {
     #[ODM\Id(strategy: 'NONE')]
@@ -31,7 +41,7 @@ class Project
     public function __construct()
     {
         $this->id = RamseyGuid::uuid4()->toString();
-        $this->createdAt = new DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?string
